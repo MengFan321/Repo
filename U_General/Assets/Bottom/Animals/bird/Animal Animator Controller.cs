@@ -9,7 +9,7 @@ public class Animal : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-       
+
         animator.ResetTrigger("Click Trigger");
     }
 
