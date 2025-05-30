@@ -50,17 +50,17 @@ public class TimeSystem_7 : MonoBehaviour
         { "2010-01", "5G技术研发" }
     };
 
-    void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject); // 防止场景中有多个 TimeSystem_7 导致冲突
-        }
-    }
+    //void Awake()
+    //{
+    //    if (Instance == null)
+    //    {
+    //        Instance = this;
+    //    }
+    //    else
+    //    {
+    //        Destroy(gameObject); // 防止场景中有多个 TimeSystem_7 导致冲突
+    //    }
+    //}
 
     void Start()
     {
@@ -201,7 +201,7 @@ public class TimeSystem_7 : MonoBehaviour
             timeText.color = Color.black;
         }
 
-        timeText.text = $"{currentYear}-{currentMonth:D2}";
+        timeText.text = $"{currentYear}\n{currentMonth:D2}";
 
         // 检查是否达到特殊日期
         if (specialEvents.ContainsKey(currentDateString))

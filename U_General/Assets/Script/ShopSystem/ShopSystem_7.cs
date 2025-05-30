@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,6 +29,8 @@ public class ShopSystem_7 : MonoBehaviour
     public GameObject workerPrefab; // 工人Prefab
     public Transform workerParent; // 工人父对象（用于组织工人对象）
     public BoxCollider2D workerAreaCollider; // 工人区域的BoxCollider2D
+    public Transform workerParent2; // 第二个工人父对象
+    public BoxCollider2D workerAreaCollider2; // 第二个工人区域的BoxCollider2D
 
     public Transform itemParent; // 商品父对象（用于组织商品对象）
     public BoxCollider2D itemAreaCollider; // 商品区域的BoxCollider2D
@@ -61,6 +64,26 @@ public class ShopSystem_7 : MonoBehaviour
     // 用于记录每个商品Prefab的引用
     private Dictionary<int, List<GameObject>> itemPrefabsInScene = new Dictionary<int, List<GameObject>>();
 
+    // 定义设备商品
+    public Item deviceItem = new Item
+    {
+        id = 999, // 特殊ID
+        name = "设备",
+        cost = 300, // 初始购买价格
+        sellPrice = 0, // 设备不参与利润计算
+        prefab = null // 设备不需要Prefab
+    };
+
+    private int deviceLevel = 0; // 设备等级，用于控制功能
+    private const int devicePriceLevel1 = 300; // 第一次购买价格
+    private const int devicePriceLevel2 = 600; // 第二次购买价格
+    private const int devicePriceLevel3 = 900; // 第二次购买价格
+
+    public Button deviceButton; // 设备购买按钮
+    public TextMeshProUGUI deviceText; // 设备按钮上的文本
+
+    public TextMeshProUGUI lowestProfitText; // 用于显示利润最低商品的TextMeshProUGUI
+
     void Start()
     {
         UpdateUI();
@@ -86,15 +109,19 @@ public class ShopSystem_7 : MonoBehaviour
 
         // 为移除工人按钮添加点击事件
         removeWorkerButton.onClick.AddListener(RemoveWorker);
+
+        // 初始化设备按钮
+        deviceButton.onClick.AddListener(BuyDevice);
+        UpdateDeviceButton();
     }
 
     private void UpdateUI()
     {
-        moneyText.text = $"金额: {playerMoney}";
-        workerCountText.text = $"员工: {workerCount}";
+        moneyText.text = $"Money: {playerMoney}";
+        workerCountText.text = $"WorkerCount: {workerCount}";
 
         // 更新购物车内容
-        cartText.text = "购物车:\n";
+        cartText.text = "CartList:\n";
         foreach (var item in cartItems)
         {
             Item itemInAllItems = allItems.Find(i => i.id == item.Key);
@@ -105,8 +132,10 @@ public class ShopSystem_7 : MonoBehaviour
         }
         if (cartWorkerCount != 0)
         {
-            cartText.text += $"员工: {cartWorkerCount}\n";
+            cartText.text += $"Worker: {cartWorkerCount}\n";
         }
+
+        UpdateDeviceButton();
     }
 
     private void AddToCart(int index)
@@ -221,6 +250,8 @@ public class ShopSystem_7 : MonoBehaviour
         }
     }
 
+
+
     private GameObject SpawnItemPrefab(GameObject prefab)
     {
         Bounds bounds = itemAreaCollider.bounds;
@@ -231,28 +262,84 @@ public class ShopSystem_7 : MonoBehaviour
         return Instantiate(prefab, randomPosition, Quaternion.identity, itemParent);
     }
 
+
+    private bool IsPositionOccupied(Vector3 position, Transform parent, float radius = 0.5f)
+    {
+        // 检查目标位置是否在某个工人Prefab的碰撞体范围内
+        foreach (Transform child in parent)
+        {
+            if (Vector3.Distance(position, child.position) < radius)
+            {
+                return true; // 位置被占用
+            }
+        }
+        return false; // 位置未被占用
+    }
+
     private void SpawnWorkerPrefab()
     {
-        Bounds bounds = workerAreaCollider.bounds;
-        Vector3 randomPosition = new Vector3(
-            Random.Range(bounds.min.x, bounds.max.x), // x方向随机范围
-            Random.Range(bounds.min.y, bounds.max.y) // y方向随机范围
-        );
-        Instantiate(workerPrefab, randomPosition, Quaternion.identity, workerParent);
+        // 随机选择一个工人生成区域
+        int areaIndex = Random.Range(0, 2); // 0 表示第一个区域，1 表示第二个区域
+
+        BoxCollider2D selectedCollider;
+        Transform selectedParent;
+
+        if (areaIndex == 0)
+        {
+            selectedCollider = workerAreaCollider;
+            selectedParent = workerParent;
+        }
+        else
+        {
+            selectedCollider = workerAreaCollider2;
+            selectedParent = workerParent2;
+        }
+
+        // 在选定的区域中随机生成工人
+        Bounds bounds = selectedCollider.bounds;
+        Vector3 randomPosition = Vector3.zero; // 初始化为零向量，确保变量已赋值
+
+        // 尝试找到一个未被占用的位置
+        int maxAttempts = 100; // 最大尝试次数，避免无限循环
+        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            randomPosition = new Vector3(
+                Random.Range(bounds.min.x, bounds.max.x), // x方向随机范围
+                Random.Range(bounds.min.y, bounds.max.y) // y方向随机范围
+            );
+
+            if (!IsPositionOccupied(randomPosition, selectedParent))
+            {
+                // 找到一个未被占用的位置，生成工人
+                Instantiate(workerPrefab, randomPosition, Quaternion.identity, selectedParent);
+                return;
+            }
+        }
+
+        // 如果尝试了最大次数仍未找到合适的位置，则在最后一个位置生成工人
+        Instantiate(workerPrefab, randomPosition, Quaternion.identity, selectedParent);
     }
 
     private void DestroyWorkerPrefab()
     {
+        // 优先销毁第一个区域的工人
         if (workerParent.childCount > 0)
         {
             Destroy(workerParent.GetChild(0).gameObject);
+            return;
+        }
+
+        // 如果第一个区域没有工人，则销毁第二个区域的工人
+        if (workerParent2.childCount > 0)
+        {
+            Destroy(workerParent2.GetChild(0).gameObject);
         }
     }
 
     //public void AutoCheckout()
     //{
     //    int totalCost = CalculateTotalCost();
-    
+
 
     //    if (playerMoney >= totalCost)
     //    {
@@ -332,6 +419,8 @@ public class ShopSystem_7 : MonoBehaviour
         {
             totalCost += cartWorkerCount * workerPrice;
         }
+        // 加上设备的总成本
+        totalCost += TotalSpent;
         return totalCost;
     }
 
@@ -374,5 +463,96 @@ public class ShopSystem_7 : MonoBehaviour
                 itemTexts[i].text = ""; // 清空文本内容
             }
         }
+    }
+
+    private void BuyDevice()
+    {
+        if (playerMoney >= GetCurrentDevicePrice())
+        {
+            playerMoney -= GetCurrentDevicePrice();
+            deviceLevel++;
+
+            // 更新总成本，根据当前设备等级决定加入的金额
+            switch (deviceLevel)
+            {
+                case 1:
+                    TotalSpent += devicePriceLevel1; // 第一次购买，加上300元
+                    break;
+                case 2:
+                    TotalSpent += devicePriceLevel2; // 第二次购买，加上600元
+                    break;
+                case 3:
+                    TotalSpent += devicePriceLevel3; // 第三次购买，加上900元
+                    break;
+            }
+
+            // 更新设备状态
+            UpdateDeviceButton();
+
+            // 显示最低利润商品
+            ShowLowestProfitItems();
+
+            UpdateUI();
+        }
+        else
+        {
+            Debug.Log("金额不足！");
+        }
+    }
+
+    private int GetCurrentDevicePrice()
+    {
+        switch (deviceLevel)
+        {
+            case 0:
+                return devicePriceLevel1;
+            case 1:
+                return devicePriceLevel2;
+            case 2:
+                return devicePriceLevel3;
+            default:
+                return 0; // 如果设备等级超过3，返回0（理论上不会发生）
+        }
+    }
+
+    private void UpdateDeviceButton()
+    {
+        if (deviceLevel == 0)
+        {
+            deviceText.text = $"设备\nCost: {devicePriceLevel1}";
+        }
+        else if (deviceLevel == 1)
+        {
+            deviceText.text = $"设备\nCost: {devicePriceLevel2}";
+        }
+        else if (deviceLevel == 2)
+        {
+            deviceText.text = $"设备\nCost: {devicePriceLevel3}";
+        }
+        else
+        {
+            deviceButton.gameObject.SetActive(false); // 隐藏按钮
+            deviceText.text = "设备已购买";
+        }
+    }
+
+    private void ShowLowestProfitItems()
+    {
+        // 计算所有商品的利润
+        List<Item> sortedItems = allItems.OrderBy(item => item.sellPrice - item.cost).ToList();
+
+        // 根据设备等级显示最低利润商品
+        int count = Mathf.Min(deviceLevel, 3); // 第一次购买显示1个，第二次购买显示2个，第三次购买显示3个
+        string message = "最低利润商品:\n";
+        for (int i = 0; i < count; i++)
+        {
+            if (i < sortedItems.Count) // 确保不会超出商品列表的范围
+            {
+                message += $"{sortedItems[i].name} (利润: {sortedItems[i].sellPrice - sortedItems[i].cost})\n";
+            }
+        }
+
+        // 更新TextMeshProUGUI的文本内容
+        lowestProfitText.text = message;
     }
 }
