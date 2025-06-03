@@ -20,6 +20,11 @@ public class DialogueTriggerInfo
 
     [Header("新增：唯一标识")]
     public string uniqueId;              // 新增：每个触发器的唯一标识
+
+    [Header("NPC形象控制")]
+    public GameObject npcPanelLeft;   // 左侧NPC形象
+    public GameObject npcPanelRight;  // 右侧NPC形象
+
 }
 
 public class MultiTimeDialogueTrigger : MonoBehaviour
@@ -162,6 +167,11 @@ public class MultiTimeDialogueTrigger : MonoBehaviour
             trigger.speechBubble.SetActive(false);
         if (trigger.dialogueUI != null)
             trigger.dialogueUI.SetActive(false);
+        // ✅ 新增：隐藏 NPC 面板
+        if (trigger.npcPanelLeft != null)
+            trigger.npcPanelLeft.SetActive(false);
+        if (trigger.npcPanelRight != null)
+            trigger.npcPanelRight.SetActive(false);
 
         // 设置按钮监听
         if (trigger.bubbleButton != null)
@@ -261,6 +271,8 @@ public class MultiTimeDialogueTrigger : MonoBehaviour
         try
         {
             // 关闭当前活跃的触发器
+            DeactivateAllNpcPanels();
+
             DeactivateCurrentTrigger();
 
             if (trigger.speechBubble != null)
@@ -278,6 +290,11 @@ public class MultiTimeDialogueTrigger : MonoBehaviour
 
                 // 强制刷新UI
                 StartCoroutine(ForceRefreshUI(trigger.speechBubble));
+
+                if (trigger.npcPanelLeft != null)
+                    trigger.npcPanelLeft.SetActive(true);
+                if (trigger.npcPanelRight != null)
+                    trigger.npcPanelRight.SetActive(true);
 
                 currentActiveTrigger = trigger;
             }
@@ -302,6 +319,11 @@ public class MultiTimeDialogueTrigger : MonoBehaviour
                 currentActiveTrigger.speechBubble.SetActive(false);
             if (currentActiveTrigger.dialogueUI != null)
                 currentActiveTrigger.dialogueUI.SetActive(false);
+
+            if (currentActiveTrigger.npcPanelLeft != null)
+                currentActiveTrigger.npcPanelLeft.SetActive(false);
+            if (currentActiveTrigger.npcPanelRight != null)
+                currentActiveTrigger.npcPanelRight.SetActive(false);
 
             DebugLog($"🔽 已关闭触发器: {currentActiveTrigger.uniqueId} ({currentActiveTrigger.triggerDate})");
         }
@@ -587,4 +609,15 @@ public class MultiTimeDialogueTrigger : MonoBehaviour
         }
         Debug.Log("🔄 已重置所有对话完成状态");
     }
+    void DeactivateAllNpcPanels()
+    {
+        foreach (var trigger in dialogueTriggers)
+        {
+            if (trigger.npcPanelLeft != null)
+                trigger.npcPanelLeft.SetActive(false);
+            if (trigger.npcPanelRight != null)
+                trigger.npcPanelRight.SetActive(false);
+        }
+    }
+
 }
