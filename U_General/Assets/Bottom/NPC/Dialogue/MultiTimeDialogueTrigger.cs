@@ -36,6 +36,13 @@ public class MultiTimeDialogueTrigger : MonoBehaviour
     public bool enableDebugMode = true;
     public bool logDetailedInfo = true;
 
+    // ───── 新增：播放气泡音效的字段 ─────
+    [Header("UI 音效")]
+    public AudioSource uiAudioSource;    // 拖一个场景中带 AudioSource 的物体进来
+    public AudioClip bubbleClip;         // 气泡弹出时要播放的音效（.wav/.mp3）
+    public AudioClip bubbleClickClip;    // ── 新增：点击气泡时播放的音效
+
+
     private DialogueTriggerInfo currentActiveTrigger = null;
     private string lastCheckedDate = "";
     private bool isDialogueSystemBusy = false;
@@ -50,6 +57,12 @@ public class MultiTimeDialogueTrigger : MonoBehaviour
 
     void Start()
     {
+        // ───── 如果没有手动在 Inspector 里拖 AudioSource，这里尝试自动获取 ─────
+        if (uiAudioSource == null)
+        {
+            uiAudioSource = GetComponent<AudioSource>();
+        }
+
         InitializeDialogueSystem();
     }
 
@@ -277,20 +290,33 @@ public class MultiTimeDialogueTrigger : MonoBehaviour
 
             if (trigger.speechBubble != null)
             {
+                //1.播放音效
+                if (uiAudioSource != null && bubbleClip != null)
+                {
+                    uiAudioSource.PlayOneShot(bubbleClip);
+                }
+
+                // 2. 弹出气泡
                 trigger.speechBubble.SetActive(true);
                 trigger.hasBeenTriggered = true;
+                // ───【新增部分】同时把对话框也打开（但不开始播放文字）
+                if (trigger.dialogueUI != null)
+                {
+                    trigger.dialogueUI.SetActive(true);
+                }
 
-                DebugLog($"🔼 已激活气泡: ID[{trigger.uniqueId}], 日期[{trigger.triggerDate}], 对话行数[{trigger.dialogueLines?.Length ?? 0}]");
+                DebugLog($"🔼 已激活气泡& 对话框: ID[{trigger.uniqueId}], 日期[{trigger.triggerDate}], 对话行数[{trigger.dialogueLines?.Length ?? 0}]");
 
-                // 输出对话内容预览用于验证
+                // 3. 输出调试：预览第一行文本
                 if (trigger.dialogueLines != null && trigger.dialogueLines.Length > 0)
                 {
                     DebugLog($"📝 对话内容预览: \"{trigger.dialogueLines[0]}\" (共{trigger.dialogueLines.Length}行)");
                 }
 
-                // 强制刷新UI
+                // 4. 强制刷新 UI
                 StartCoroutine(ForceRefreshUI(trigger.speechBubble));
 
+                // 5. 显示左右 NPC 形象
                 if (trigger.npcPanelLeft != null)
                     trigger.npcPanelLeft.SetActive(true);
                 if (trigger.npcPanelRight != null)
@@ -356,6 +382,13 @@ public class MultiTimeDialogueTrigger : MonoBehaviour
     void OnBubbleClicked(DialogueTriggerInfo trigger, int triggerIndex)
     {
         DebugLog($"🔥 气泡点击事件开始");
+
+        // ───【新增】播放“点击气泡”音效 ───
+        if (uiAudioSource != null && bubbleClickClip != null)
+        {
+            uiAudioSource.PlayOneShot(bubbleClickClip);
+        }
+
         DebugLog($"   传入的触发器ID: {trigger?.uniqueId ?? "NULL"}");
         DebugLog($"   传入的索引: {triggerIndex}");
         DebugLog($"   当前活跃触发器ID: {currentActiveTrigger?.uniqueId ?? "NULL"}");

@@ -50,17 +50,17 @@ public class TimeSystem_7 : MonoBehaviour
         { "2010-01", "5G技术研发" }
     };
 
-    //void Awake()
-    //{
-    //    if (Instance == null)
-    //    {
-    //        Instance = this;
-    //    }
-    //    else
-    //    {
-    //        Destroy(gameObject); // 防止场景中有多个 TimeSystem_7 导致冲突
-    //    }
-    //}
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject); // 防止场景中有多个 TimeSystem_7 导致冲突
+        }
+    }
 
     void Start()
     {
