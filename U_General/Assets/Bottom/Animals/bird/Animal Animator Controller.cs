@@ -9,10 +9,17 @@ public class Animal : MonoBehaviour
 
     public AudioClip clickSound; // 拖入你想播放的音效
 
-    void Start()
+    // ① 在 Awake 中预热音频
+    void Awake()
     {
         animator = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>(); // 获取挂载在本物体上的 AudioSource
+        audioSource = GetComponent<AudioSource>();
+
+        if (clickSound != null)
+        {
+            // 强制把音频数据加载并解码到内存
+            clickSound.LoadAudioData();
+        }
 
         animator.ResetTrigger("Click Trigger");
     }

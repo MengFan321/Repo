@@ -40,6 +40,12 @@ public class TimeSystem_7 : MonoBehaviour
     private string lastCheckedMonth = "";
     private bool monthJustChanged = false;
 
+    /// <summary>当前游戏年份（从 startingYear 算起）</summary>
+    public int CurrentGameYear => startingYear + gameTimeMonths / 12;
+    /// <summary>当前游戏月份（1–12）</summary>
+    public int CurrentGameMonth => gameTimeMonths % 12 + 1;
+
+
     // 特殊日期和文字
     private Dictionary<string, string> specialEvents = new Dictionary<string, string>
     {

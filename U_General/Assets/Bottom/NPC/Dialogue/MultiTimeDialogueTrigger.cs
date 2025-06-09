@@ -57,12 +57,17 @@ public class MultiTimeDialogueTrigger : MonoBehaviour
 
     void Start()
     {
-        // ───── 如果没有手动在 Inspector 里拖 AudioSource，这里尝试自动获取 ─────
+        // —— ① 确保拿到 AudioSource —— 
         if (uiAudioSource == null)
-        {
             uiAudioSource = GetComponent<AudioSource>();
-        }
 
+        // —— ② 预热音效，强制解码到内存 —— 
+        if (bubbleClip != null)
+            bubbleClip.LoadAudioData();
+        if (bubbleClickClip != null)
+            bubbleClickClip.LoadAudioData();
+
+        // —— ③ 继续初始化对话系统 —— 
         InitializeDialogueSystem();
     }
 
