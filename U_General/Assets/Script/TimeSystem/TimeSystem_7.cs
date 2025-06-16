@@ -17,7 +17,7 @@ public class TimeSystem_7 : MonoBehaviour
     public TextMeshProUGUI settlementText; // 结算信息的TextMeshProUGUI
     public ShopSystem_7 shopSystem; // 引用ShopSystem脚本
 
-    // 新增UI组件
+    // UI组件
     public GameObject specialEventUI; // 特殊事件UI
     public TextMeshProUGUI specialEventText; // 特殊事件文字
 
@@ -29,6 +29,8 @@ public class TimeSystem_7 : MonoBehaviour
     private int gameTimeMonths = 0;
     private int startingYear = 1985;
     private int startingMonth = 1;
+
+    private bool isCartExceedWorkerCapacity = false;// 新增标志变量
 
     // 新增：对话暂停相关变量
     private bool isDialoguePaused = false;
@@ -124,6 +126,7 @@ public class TimeSystem_7 : MonoBehaviour
         // 每50秒结算一次，但需要先检查接下来的月份是否有对话
         if (realTimeSeconds >= 50f)
         {
+           
             // 检查接下来的两个月是否有对话
             bool hasDialogueInNextMonths = false;
             int targetGameMonths = gameTimeMonths;
@@ -146,7 +149,13 @@ public class TimeSystem_7 : MonoBehaviour
                     gameTimeMonths = targetGameMonths;
                     realTimeSeconds = 0f;
                     shopSystem.AutoCheckout();
-
+                    /***************************************/
+                    // 根据当前时间选择商品
+                    int nowYear = startingYear + (startingMonth + gameTimeMonths - 1) / 12;
+                    int nowMonth = (startingMonth + gameTimeMonths - 1) % 12 + 1;
+                    shopSystem.SelectItemsByTime(nowYear, nowMonth);
+                    isCartExceedWorkerCapacity = false; // 重置标志
+                    /***************************************/
                     // 立即暂停
                     PauseTimeForDialogueMonth(checkDateString);
                     break;
@@ -159,7 +168,13 @@ public class TimeSystem_7 : MonoBehaviour
                 gameTimeMonths += 2;
                 realTimeSeconds = 0f;
                 shopSystem.AutoCheckout();
-
+                /***************************************/
+                // 根据当前时间选择商品
+                int nowYear = startingYear + (startingMonth + gameTimeMonths - 1) / 12;
+                int nowMonth = (startingMonth + gameTimeMonths - 1) % 12 + 1;
+                shopSystem.SelectItemsByTime(nowYear, nowMonth);
+                isCartExceedWorkerCapacity = false; // 重置标志
+                /***************************************/
                 int nextYear = startingYear + (startingMonth + gameTimeMonths - 1) / 12;
                 int nextMonth = (startingMonth + gameTimeMonths - 1) % 12 + 1;
                 Debug.Log($"⏰ 正常前进到: {nextYear:D4}-{nextMonth:D2}");
@@ -333,13 +348,32 @@ public class TimeSystem_7 : MonoBehaviour
         return realTimeSeconds / 50f;
     }
 
- 
+
     private void ShowSettlement()
     {
         int totalSpent = shopSystem.TotalSpent;
         int totalSellPrice = shopSystem.CalculateTotalSellPrice();
 
-        settlementText.text = $"结算：\n成本: {totalSpent}\n出售: {totalSellPrice}";
+        settlementText.text = $"Checkout：\nCost: {totalSpent}\nSell: {totalSellPrice}";
+
+        // 检查是否需要显示提醒
+        if (isCartExceedWorkerCapacity)
+        {
+            // 添加提醒文本
+            settlementText.text += "\n\nWarning: You have purchased more items than your workers can process.";
+
+            // 显示未售出的商品信息
+            if (shopSystem.excessItems.Count > 0)
+            {
+                settlementText.text += "\n\nUnsold Items:";
+                foreach (var item in shopSystem.excessItems)
+                {
+                    settlementText.text += $"\n- {item.name} (Cost: {item.cost}, Sell Price: {item.sellPrice})";
+                }
+            }
+
+        }
+
     }
 
     // 新增：用于npc对话
@@ -403,5 +437,10 @@ public class TimeSystem_7 : MonoBehaviour
         {
             Debug.Log("时间系统未暂停，无需恢复");
         }
+    }
+
+    public void SetCartExceedWorkerCapacity(bool value)
+    {
+        isCartExceedWorkerCapacity = value;
     }
 }

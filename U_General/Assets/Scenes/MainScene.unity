@@ -1582,50 +1582,157 @@ MonoBehaviour:
     cost: 10
     sellPrice: 80
     prefab: {fileID: 3951822150210610744, guid: c1961bc245ef25c4b9aab42bb006b918, type: 3}
+    itemImage: {fileID: 21300000, guid: f9c599ef48d48ac4593fc78929dafe74, type: 3}
   - id: 1
     name: "\u82F9\u679C"
     cost: 20
     sellPrice: 80
     prefab: {fileID: 1225741163148466630, guid: 8a5bda8a09e16364a9cb77d567fc1f00, type: 3}
+    itemImage: {fileID: 21300000, guid: 7ec514fa32fdd584e96126556fa08990, type: 3}
   - id: 2
     name: "\u76D0"
     cost: 10
     sellPrice: 60
     prefab: {fileID: 4867979475896928129, guid: 9357c3bb5cc27f8439b93ec0b6cccab3, type: 3}
+    itemImage: {fileID: 21300000, guid: b0f37361dceb2354ebc61cd66023b1c6, type: 3}
   - id: 3
     name: "\u7530\u5B50\u672C"
     cost: 10
     sellPrice: 30
     prefab: {fileID: 3146451791416914269, guid: 2c05dea4e04f2874fa910905ef27d894, type: 3}
+    itemImage: {fileID: 21300000, guid: 9f4e0ecff6aa4f14b9bbcdbbe9cdbc93, type: 3}
   - id: 4
     name: "\u9999\u8549"
     cost: 40
     sellPrice: 80
     prefab: {fileID: 6725317919388986820, guid: f3c9ea33617b0434585111220788b6b5, type: 3}
+    itemImage: {fileID: 21300000, guid: b697a75bda813bc4b9c70d30dbbcc016, type: 3}
   - id: 5
     name: "\u767D\u83DC"
     cost: 20
     sellPrice: 60
     prefab: {fileID: 5697448003996064742, guid: d8c5fba768bd53140b5c6e672b737c8e, type: 3}
+    itemImage: {fileID: 21300000, guid: f9370d5530dfce9499e3f61cc5f33d53, type: 3}
   - id: 6
     name: "\u80A5\u7682"
     cost: 40
     sellPrice: 140
     prefab: {fileID: 2664624921960183708, guid: ff4e2d5c2c6d2514ca49aa18fef132a5, type: 3}
+    itemImage: {fileID: 21300000, guid: eed1c8b7b5fe94642a476be6fa242d16, type: 3}
   - id: 7
     name: "\u7C89\u7B14"
     cost: 5
     sellPrice: 5
     prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 0bd08733174d6084c87609f20cb70e25, type: 3}
+  - id: 8
+    name: "\u7ECF\u6D4E\u5B66\u4E66\u672C"
+    cost: 20
+    sellPrice: 140
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 0cafd03d5c3814e4ea5f5206082f3e50, type: 3}
+  - id: 9
+    name: "\u94A2\u7B14"
+    cost: 80
+    sellPrice: 140
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 2bb155f2e9e2417499fe3dc12759f471, type: 3}
+  - id: 10
+    name: "\u9762\u5305"
+    cost: 80
+    sellPrice: 0
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 0c280bd13b1886e4fa4aa8158f067b7b, type: 3}
+  - id: 11
+    name: "\u9999\u6CE2"
+    cost: 40
+    sellPrice: 140
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: b02c0addba33ea94c846bed5f755ddcd, type: 3}
+  - id: 12
+    name: "\u6536\u97F3\u673A"
+    cost: 100
+    sellPrice: 30
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 19d7a04fbb4de354bacfa322e7d50589, type: 3}
+  - id: 13
+    name: "\u6C99\u62C9"
+    cost: 80
+    sellPrice: 30
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 6047960dfacb8fd4282593b92df0bbbf, type: 3}
+  - id: 14
+    name: "\u5BFF\u53F8"
+    cost: 40
+    sellPrice: 80
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 504d1c0a04699014d9798c991cfc4ccf, type: 3}
+  - id: 15
+    name: "\u5DE7\u514B\u529B"
+    cost: 80
+    sellPrice: 140
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 90a57e471130c65489b0553066b71888, type: 3}
+  - id: 16
+    name: "\u5976\u9F99\u5C38\u5757"
+    cost: 20
+    sellPrice: 140
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 480dec94e24fbff4ea7c2afd46391e46, type: 3}
+  - id: 17
+    name: "\u62A4\u80A4\u54C1\u4FDD\u6E7F\u6C34"
+    cost: 100
+    sellPrice: 140
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: b77f48c602f3bb84c9be995040f0a202, type: 3}
+  - id: 18
+    name: "\u84DD\u7259\u8033\u673A"
+    cost: 100
+    sellPrice: 140
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: c63852119344a3441b3594e901402aa6, type: 3}
+  - id: 19
+    name: "\u6B66\u6C49\u957F\u6C5F\u5927\u6865\u6A21\u578B"
+    cost: 20
+    sellPrice: 140
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: b3d2997cfb849cf4a904f7bb9a164a3c, type: 3}
+  - id: 20
+    name: "5G\u624B\u673A"
+    cost: 40
+    sellPrice: 140
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 93d6a77fc5ae3af4fb5e83d24cb2c26f, type: 3}
+  - id: 21
+    name: "\u9762\u5305"
+    cost: 40
+    sellPrice: 80
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 0c280bd13b1886e4fa4aa8158f067b7b, type: 3}
+  - id: 23
+    name: "\u5DE7\u514B\u529B"
+    cost: 100
+    sellPrice: 0
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: 90a57e471130c65489b0553066b71888, type: 3}
+  - id: 22
+    name: "\u7D2B\u8346\u82B1\u53D1\u5361"
+    cost: 100
+    sellPrice: 0
+    prefab: {fileID: 6029415642123668075, guid: 2d6b5df0c1444a443acc11c6b7f1e9d5, type: 3}
+    itemImage: {fileID: 21300000, guid: ab5aa1ca17a0a574099f4e442db9483c, type: 3}
   deviceItem:
     id: 999
     name: "\u8BBE\u5907"
     cost: 300
     sellPrice: 0
     prefab: {fileID: 0}
+    itemImage: {fileID: 0}
   deviceButton: {fileID: 1310702234}
   deviceText: {fileID: 755688085}
   lowestProfitText: {fileID: 761916982}
+  discardedItemsInfo: []
+  excessItems: []
 --- !u!1 &294665400
 GameObject:
   m_ObjectHideFlags: 0

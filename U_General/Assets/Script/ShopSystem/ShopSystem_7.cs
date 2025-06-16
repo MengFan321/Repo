@@ -13,8 +13,8 @@ public class Item
     public int cost; // 商品成本
     public int sellPrice; // 商品售价
     public GameObject prefab; // 商品Prefab
+    public Sprite itemImage; // 商品图片
 }
-
 public class ShopSystem_7 : MonoBehaviour
 {
     public TextMeshProUGUI moneyText; // 显示玩家资金的TextMeshProUGUI
@@ -46,6 +46,7 @@ public class ShopSystem_7 : MonoBehaviour
     public int TotalSpent { get; private set; } // 总花费，公开只读
 
     // 定义所有商品
+    
     public List<Item> allItems = new List<Item>
     {
         new Item { id = 0, name = "大米", cost = 10, sellPrice = 80, prefab = null },
@@ -55,8 +56,29 @@ public class ShopSystem_7 : MonoBehaviour
         new Item { id = 4, name = "香蕉", cost = 40, sellPrice = 80, prefab = null },
         new Item { id = 5, name = "白菜", cost = 20, sellPrice = 60, prefab = null },
         new Item { id = 6, name = "肥皂", cost = 40, sellPrice = 140, prefab = null },
-        new Item { id = 7, name = "粉笔", cost = 5, sellPrice = 5, prefab = null }
+        new Item { id = 7, name = "粉笔", cost = 5, sellPrice = 5, prefab = null },
+        new Item { id = 8, name = "经济学书本", cost = 20, sellPrice = 140, prefab = null },
+        new Item { id = 9, name = "钢笔", cost = 80, sellPrice = 140, prefab = null },
+        new Item { id = 10, name = "面包", cost = 80, sellPrice = 0, prefab = null },
+        new Item { id = 11, name = "香波", cost = 40, sellPrice = 140, prefab = null },
+        new Item { id = 12, name = "收音机", cost = 100, sellPrice = 30, prefab = null },
+        new Item { id = 13, name = "沙拉", cost = 80, sellPrice = 30, prefab = null },
+        new Item { id = 14, name = "寿司", cost = 40, sellPrice = 80, prefab = null },
+        new Item { id = 15, name = "巧克力", cost = 80, sellPrice = 140, prefab = null },
+        new Item { id = 16, name = "奶龙尸块", cost = 20, sellPrice = 140, prefab = null },
+        new Item { id = 17, name = "护肤品保湿水", cost = 100, sellPrice = 140, prefab = null },
+        new Item { id = 18, name = "蓝牙耳机", cost = 100, sellPrice = 140, prefab = null },
+        new Item { id = 19, name = "武汉长江大桥模型", cost = 20, sellPrice = 140, prefab = null },
+        new Item { id = 20, name = "5G手机", cost = 40, sellPrice = 140, prefab = null },
+        new Item { id = 21, name = "面包", cost = 40, sellPrice = 80, prefab = null },
+        new Item { id = 22, name = "巧克力", cost = 100, sellPrice = 0, prefab = null },
+        new Item { id = 23, name = "紫荆花发卡", cost = 60, sellPrice = 140, prefab = null },
+
     };
+    // 根据时间段选择商品
+    private Dictionary<string, List<Item>> itemsByTimePeriod;
+
+
 
     // 当前显示的商品
     private List<Item> currentItems = new List<Item>();
@@ -84,17 +106,37 @@ public class ShopSystem_7 : MonoBehaviour
 
     public TextMeshProUGUI lowestProfitText; // 用于显示利润最低商品的TextMeshProUGUI
 
+    // 添加一个标志变量，用于记录是否超出工人可加工数量
+    public bool IsCartExceedWorkerCapacity => cartItems.Values.Sum() > workerCount * 3;
+    public List<string> discardedItemsInfo = new List<string>(); // 用于存储被丢弃的商品信息
     void Start()
     {
+        // 初始化时间段商品字典
+        InitializeItemsByTimePeriod();
+
+        // 根据当前时间选择商品
+        int currentYear = 1985; // 假设初始年份是 1985
+        int currentMonth = 1;
+        SelectItemsByTime(currentYear, currentMonth);
+
         UpdateUI();
 
-        // 随机选择6种商品
-        SelectRandomItems();
-        // 为每个商品按钮添加点击事件
+
+        // 为每个商品按钮添加点击事件并设置图片
         for (int i = 0; i < buyButtons.Length; i++)
         {
             int index = i; // 保存当前按钮的索引
             buyButtons[i].onClick.AddListener(() => AddToCart(index));
+
+            // 设置按钮图片
+            if (i < currentItems.Count && currentItems[i].itemImage != null)
+            {
+                buyButtons[i].GetComponent<Image>().sprite = currentItems[i].itemImage;
+            }
+            else
+            {
+                buyButtons[i].GetComponent<Image>().sprite = null; // 如果没有图片，清空
+            }
         }
 
         // 为购买工人按钮添加点击事件
@@ -172,6 +214,8 @@ public class ShopSystem_7 : MonoBehaviour
             itemPrefabsInScene[item.id].Add(instantiatedPrefab);
 
             UpdateUI();
+
+            CheckCartCapacity();
         }
         else
         {
@@ -207,6 +251,8 @@ public class ShopSystem_7 : MonoBehaviour
             }
 
             UpdateUI();
+            // 检查购物车状态
+            CheckCartCapacity();
         }
     }
 
@@ -223,6 +269,8 @@ public class ShopSystem_7 : MonoBehaviour
             SpawnWorkerPrefab();
 
             UpdateUI();
+            // 检查购物车状态
+            CheckCartCapacity();
         }
         else
         {
@@ -243,6 +291,8 @@ public class ShopSystem_7 : MonoBehaviour
             DestroyWorkerPrefab();
 
             UpdateUI();
+            // 检查购物车状态
+            CheckCartCapacity();
         }
         else
         {
@@ -336,72 +386,31 @@ public class ShopSystem_7 : MonoBehaviour
         }
     }
 
-    //public void AutoCheckout()
-    //{
-    //    int totalCost = CalculateTotalCost();
-
-
-    //    if (playerMoney >= totalCost)
-    //    {
-    //        playerMoney -= totalCost;
-
-    //        foreach (var item in cartItems)
-    //        {
-    //            // 更新已购商品数量
-    //            Item itemInAllItems = allItems.Find(i => i.id == item.Key);
-    //            if (itemInAllItems != null)
-    //            {
-    //                itemInAllItems.cost = item.Value; // 这里可能需要修改逻辑
-    //            }
-    //        }
-
-    //        // 清空购物车
-    //        cartItems.Clear();
-    //        cartWorkerCount = 0;
-    //        TotalSpent = 0;
-
-    //        // 清空所有商品Prefab
-    //        foreach (var list in itemPrefabsInScene.Values)
-    //        {
-    //            foreach (var prefab in list)
-    //            {
-    //                Destroy(prefab);
-    //            }
-    //        }
-    //        itemPrefabsInScene.Clear();
-
-    //        UpdateUI();
-    //    }
-    //    else
-    //    {
-    //        Debug.Log("金额不足！");
-    //    }
-    //}
-
     public void AutoCheckout()
     {
+        // 处理超出的商品
+        HandleExcessItems();
         int totalCost = CalculateTotalCost();
         int totalSellPrice = CalculateTotalSellPrice();
-
         playerMoney += totalSellPrice; // 结算时增加资金
 
         // 清空购物车
         cartItems.Clear();
-            cartWorkerCount = 0;
-            TotalSpent = 0;
+        cartWorkerCount = 0;
+        TotalSpent = 0;
 
-            // 清空所有商品Prefab
-            foreach (var list in itemPrefabsInScene.Values)
+        // 清空所有商品Prefab
+        foreach (var list in itemPrefabsInScene.Values)
+        {
+            foreach (var prefab in list)
             {
-                foreach (var prefab in list)
-                {
-                    Destroy(prefab);
-                }
+                Destroy(prefab);
             }
-            itemPrefabsInScene.Clear();
+        }
+        itemPrefabsInScene.Clear();
 
-            UpdateUI();
-       
+        UpdateUI();
+
     }
 
     private int CalculateTotalCost()
@@ -426,6 +435,8 @@ public class ShopSystem_7 : MonoBehaviour
 
     public int CalculateTotalSellPrice()
     {
+        // 处理超出的商品
+        HandleExcessItems();
         int totalSellPrice = 0;
         foreach (var item in cartItems)
         {
@@ -435,36 +446,11 @@ public class ShopSystem_7 : MonoBehaviour
                 totalSellPrice += itemInAllItems.sellPrice * item.Value;
             }
         }
+
         return totalSellPrice;
     }
 
-    private void SelectRandomItems()
-    {
-        currentItems.Clear();
-        List<Item> tempItems = new List<Item>(allItems);
-        while (currentItems.Count < 6 && tempItems.Count > 0)
-        {
-            int randomIndex = Random.Range(0, tempItems.Count);
-            currentItems.Add(tempItems[randomIndex]); // 直接添加引用
-            tempItems.RemoveAt(randomIndex);
-        }
-
-        // 更新商品按钮的显示
-        for (int i = 0; i < buyButtons.Length; i++)
-        {
-            if (i < currentItems.Count)
-            {
-                buyButtons[i].gameObject.SetActive(true);
-                itemTexts[i].text = $"{currentItems[i].name}\nCost: {currentItems[i].cost}";
-            }
-            else
-            {
-                buyButtons[i].gameObject.SetActive(false);
-                itemTexts[i].text = ""; // 清空文本内容
-            }
-        }
-    }
-
+    
     private void BuyDevice()
     {
         if (playerMoney >= GetCurrentDevicePrice())
@@ -554,5 +540,198 @@ public class ShopSystem_7 : MonoBehaviour
 
         // 更新TextMeshProUGUI的文本内容
         lowestProfitText.text = message;
+    }
+
+
+    // 添加一个公共方法，用于检查购物车状态
+    public void CheckCartCapacity()
+    {
+        if (IsCartExceedWorkerCapacity)
+        {
+            // 如果超出，通知 TimeSystem_7
+            TimeSystem_7 timeSystem = FindObjectOfType<TimeSystem_7>();
+            if (timeSystem != null)
+            {
+                timeSystem.SetCartExceedWorkerCapacity(true);
+                Debug.Log("购物车超出工人可加工数量，已通知 TimeSystem_7。");
+            }
+
+        }
+        else
+        {
+            // 如果未超出，通知 TimeSystem_7
+            TimeSystem_7 timeSystem = FindObjectOfType<TimeSystem_7>();
+            if (timeSystem != null)
+            {
+                timeSystem.SetCartExceedWorkerCapacity(false);
+                Debug.Log("购物车未超出工人可加工数量，已通知 TimeSystem_7。");
+            }
+        }
+    }
+
+    // 用于记录未售出的商品
+    public List<Item> excessItems = new List<Item>();
+
+    private void HandleExcessItems()
+    {
+        int totalItemsInCart = cartItems.Values.Sum();
+        int maxProcessableItems = workerCount * 3;
+        int excessItemCount = totalItemsInCart - maxProcessableItems;
+
+        if (excessItemCount > 0)
+        {
+            excessItems.Clear(); // 清空之前的记录
+
+            List<int> itemIds = new List<int>(cartItems.Keys);
+            while (excessItemCount > 0 && itemIds.Count > 0)
+            {
+                int randomIndex = Random.Range(0, itemIds.Count);
+                int itemId = itemIds[randomIndex];
+
+                Item item = allItems.Find(i => i.id == itemId);
+                if (item != null)
+                {
+                    int itemCount = cartItems[itemId];
+                    int itemsToRemove = Mathf.Min(itemCount, excessItemCount);
+
+                    cartItems[itemId] -= itemsToRemove;
+                    if (cartItems[itemId] == 0)
+                    {
+                        cartItems.Remove(itemId);
+                    }
+
+                    excessItemCount -= itemsToRemove;
+                    for (int i = 0; i < itemsToRemove; i++)
+                    {
+                        excessItems.Add(item); // 记录未售出的商品
+                    }
+                }
+
+                itemIds.RemoveAt(randomIndex);
+            }
+
+            // 调试信息
+            foreach (var item in excessItems)
+            {
+                Debug.Log($"未加工的商品: {item.name}");
+            }
+        }
+    }
+
+    private void InitializeItemsByTimePeriod()
+    {
+        itemsByTimePeriod = new Dictionary<string, List<Item>>
+        {
+            { "1985-1-1987-5", new List<Item> { allItems[0], allItems[1], allItems[2], allItems[3], allItems[4], allItems[5], allItems[6], allItems[7] } },
+            { "1987-7-1987-7", new List<Item> { allItems[10], allItems[1], allItems[2], allItems[8], allItems[4], allItems[11] } },
+            { "1987-9-1997-5", new List<Item> { allItems[21], allItems[1], allItems[2], allItems[3], allItems[9], allItems[11], allItems[12], allItems[13] } },
+            { "1997-7-1997-7", new List<Item> { allItems[23], allItems[9], allItems[15], allItems[11], allItems[10], allItems[12] } },
+            { "1997-9-2007-9", new List<Item> { allItems[14], allItems[13], allItems[15], allItems[16], allItems[9], allItems[11], allItems[17], allItems[18] } },
+            { "2007-11-2007-11", new List<Item> { allItems[19], allItems[14], allItems[9], allItems[11], allItems[17], allItems[18] } },
+            { "2008-1-2008-3", new List<Item> { allItems[14], allItems[13], allItems[15], allItems[16], allItems[9], allItems[11], allItems[17], allItems[18] } },
+            { "2008-5-2008-5", new List<Item> { allItems[10], allItems[22], allItems[13], allItems[11], allItems[17], allItems[18] } },
+            { "2008-7-2009-11", new List<Item> { allItems[14], allItems[13], allItems[15], allItems[16], allItems[9], allItems[11], allItems[17], allItems[18] } },
+            { "2010-1-2010-1", new List<Item> { allItems[20], allItems[14], allItems[13], allItems[15], allItems[16], allItems[9] } }
+            // 可以根据需要继续添加更多时间段
+            };
+    }
+    public void SelectItemsByTime(int year, int month)
+    {
+        currentItems.Clear();
+        string timePeriod = GetTimePeriod(year, month);
+
+        if (itemsByTimePeriod.ContainsKey(timePeriod))
+        {
+            List<Item> itemsForTimePeriod = itemsByTimePeriod[timePeriod];
+            // 从时间段商品列表中随机选择6种商品
+            List<Item> selectedItems = new List<Item>();
+            while (selectedItems.Count < 6)
+            {
+                int randomIndex = Random.Range(0, itemsForTimePeriod.Count);
+                Item selectedItem = itemsForTimePeriod[randomIndex];
+                if (!selectedItems.Contains(selectedItem))
+                {
+                    selectedItems.Add(selectedItem);
+                }
+            }
+            currentItems.AddRange(selectedItems);
+        }
+        else
+        {
+            Debug.LogError($"No items defined for time period: {timePeriod}");
+        }
+
+
+        // 更新商品按钮的显示
+        for (int i = 0; i < buyButtons.Length; i++)
+        {
+            if (i < currentItems.Count)
+            {
+                buyButtons[i].gameObject.SetActive(true);
+                itemTexts[i].text = $"{currentItems[i].name}\nCost: {currentItems[i].cost}";
+
+                // 设置按钮图片
+                if (currentItems[i].itemImage != null)
+                {
+                    buyButtons[i].GetComponent<Image>().sprite = currentItems[i].itemImage;
+                }
+                else
+                {
+                    buyButtons[i].GetComponent<Image>().sprite = null; // 如果没有图片，清空
+                }
+            }
+            else
+            {
+                buyButtons[i].gameObject.SetActive(false);
+                itemTexts[i].text = ""; // 清空文本内容
+            }
+        }
+    }
+
+    private string GetTimePeriod(int year, int month)
+    {
+        // 定义时间段
+        var timePeriods = new List<(string, string)>
+    {
+        ("1985-1", "1987-5"),
+        ("1987-7", "1987-7"),
+        ("1987-9", "1997-5"),
+        ("1997-7", "1997-7"),
+        ("1997-9", "2007-9"),
+        ("2007-11", "2007-11"),
+        ("2008-1", "2008-3"),
+        ("2008-5", "2008-5"),
+        ("2008-7", "2009-11"),
+        ("2010-1", "2010-1")
+    };
+
+        foreach (var (start, end) in timePeriods)
+        {
+            if (IsWithinPeriod(year, month, start, end))
+            {
+                return $"{start}-{end}";
+            }
+        }
+
+        return "Unknown";
+    }
+
+    private bool IsWithinPeriod(int year, int month, string startPeriod, string endPeriod)
+    {
+        var start = ParsePeriod(startPeriod);
+        var end = ParsePeriod(endPeriod);
+        var current = (year, month);
+
+        // 比较当前时间是否在起始时间和结束时间之间
+        bool isAfterStart = (current.Item1 > start.Item1) || (current.Item1 == start.Item1 && current.Item2 >= start.Item2);
+        bool isBeforeEnd = (current.Item1 < end.Item1) || (current.Item1 == end.Item1 && current.Item2 <= end.Item2);
+
+        return isAfterStart && isBeforeEnd;
+    }
+
+    private (int, int) ParsePeriod(string period)
+    {
+        var parts = period.Split('-');
+        return (int.Parse(parts[0]), int.Parse(parts[1]));
     }
 }
