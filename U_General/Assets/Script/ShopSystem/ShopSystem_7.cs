@@ -46,7 +46,7 @@ public class ShopSystem_7 : MonoBehaviour
     public int TotalSpent { get; private set; } // 总花费，公开只读
 
     // 定义所有商品
-    
+
     public List<Item> allItems = new List<Item>
     {
         new Item { id = 0, name = "大米", cost = 10, sellPrice = 80, prefab = null },
@@ -86,25 +86,19 @@ public class ShopSystem_7 : MonoBehaviour
     // 用于记录每个商品Prefab的引用
     private Dictionary<int, List<GameObject>> itemPrefabsInScene = new Dictionary<int, List<GameObject>>();
 
-    // 定义设备商品
-    public Item deviceItem = new Item
-    {
-        id = 999, // 特殊ID
-        name = "设备",
-        cost = 300, // 初始购买价格
-        sellPrice = 0, // 设备不参与利润计算
-        prefab = null // 设备不需要Prefab
-    };
+    
+    // 定义设备按钮和文本组件数组
+    public Button[] deviceButtons; // 设备购买按钮数组
+    public TextMeshProUGUI[] deviceTexts; // 设备按钮上的文本数组
 
-    private int deviceLevel = 0; // 设备等级，用于控制功能
+    // 定义设备价格
     private const int devicePriceLevel1 = 300; // 第一次购买价格
     private const int devicePriceLevel2 = 600; // 第二次购买价格
-    private const int devicePriceLevel3 = 900; // 第二次购买价格
+    private const int devicePriceLevel3 = 900; // 第三次购买价格
 
-    public Button deviceButton; // 设备购买按钮
-    public TextMeshProUGUI deviceText; // 设备按钮上的文本
+    // 设备等级
+    private int deviceLevel = 0; // 设备等级，用于控制功能
 
-    public TextMeshProUGUI lowestProfitText; // 用于显示利润最低商品的TextMeshProUGUI
 
     // 添加一个标志变量，用于记录是否超出工人可加工数量
     public bool IsCartExceedWorkerCapacity => cartItems.Values.Sum() > workerCount * 3;
@@ -152,9 +146,14 @@ public class ShopSystem_7 : MonoBehaviour
         // 为移除工人按钮添加点击事件
         removeWorkerButton.onClick.AddListener(RemoveWorker);
 
+        
         // 初始化设备按钮
-        deviceButton.onClick.AddListener(BuyDevice);
-        UpdateDeviceButton();
+        for (int i = 0; i < deviceButtons.Length; i++)
+        {
+            int level = i + 1; // 设备等级从1开始
+            deviceButtons[i].onClick.AddListener(() => BuyDevice(level));
+            UpdateDeviceButton(i);
+        }
     }
 
     private void UpdateUI()
@@ -177,7 +176,18 @@ public class ShopSystem_7 : MonoBehaviour
             cartText.text += $"Worker: {cartWorkerCount}\n";
         }
 
-        UpdateDeviceButton();
+        //UpdateDeviceButton();
+        // 更新设备按钮
+        for (int i = 0; i < deviceButtons.Length; i++)
+        {
+            UpdateDeviceButton(i);
+        }
+
+        //// 显示最低利润商品提示
+        //for (int i = 0; i < deviceLevel; i++)
+        //{
+        //    ShowLowestProfitItems(i + 1);
+        //}
     }
 
     private void AddToCart(int index)
@@ -450,42 +460,8 @@ public class ShopSystem_7 : MonoBehaviour
         return totalSellPrice;
     }
 
+
     
-    private void BuyDevice()
-    {
-        if (playerMoney >= GetCurrentDevicePrice())
-        {
-            playerMoney -= GetCurrentDevicePrice();
-            deviceLevel++;
-
-            // 更新总成本，根据当前设备等级决定加入的金额
-            switch (deviceLevel)
-            {
-                case 1:
-                    TotalSpent += devicePriceLevel1; // 第一次购买，加上300元
-                    break;
-                case 2:
-                    TotalSpent += devicePriceLevel2; // 第二次购买，加上600元
-                    break;
-                case 3:
-                    TotalSpent += devicePriceLevel3; // 第三次购买，加上900元
-                    break;
-            }
-
-            // 更新设备状态
-            UpdateDeviceButton();
-
-            // 显示最低利润商品
-            ShowLowestProfitItems();
-
-            UpdateUI();
-        }
-        else
-        {
-            Debug.Log("金额不足！");
-        }
-    }
-
     private int GetCurrentDevicePrice()
     {
         switch (deviceLevel)
@@ -501,48 +477,7 @@ public class ShopSystem_7 : MonoBehaviour
         }
     }
 
-    private void UpdateDeviceButton()
-    {
-        if (deviceLevel == 0)
-        {
-            deviceText.text = $"设备\nCost: {devicePriceLevel1}";
-        }
-        else if (deviceLevel == 1)
-        {
-            deviceText.text = $"设备\nCost: {devicePriceLevel2}";
-        }
-        else if (deviceLevel == 2)
-        {
-            deviceText.text = $"设备\nCost: {devicePriceLevel3}";
-        }
-        else
-        {
-            deviceButton.gameObject.SetActive(false); // 隐藏按钮
-            deviceText.text = "设备已购买";
-        }
-    }
-
-    private void ShowLowestProfitItems()
-    {
-        // 计算所有商品的利润
-        List<Item> sortedItems = allItems.OrderBy(item => item.sellPrice - item.cost).ToList();
-
-        // 根据设备等级显示最低利润商品
-        int count = Mathf.Min(deviceLevel, 3); // 第一次购买显示1个，第二次购买显示2个，第三次购买显示3个
-        string message = "最低利润商品:\n";
-        for (int i = 0; i < count; i++)
-        {
-            if (i < sortedItems.Count) // 确保不会超出商品列表的范围
-            {
-                message += $"{sortedItems[i].name} (利润: {sortedItems[i].sellPrice - sortedItems[i].cost})\n";
-            }
-        }
-
-        // 更新TextMeshProUGUI的文本内容
-        lowestProfitText.text = message;
-    }
-
-
+    
     // 添加一个公共方法，用于检查购物车状态
     public void CheckCartCapacity()
     {
@@ -668,7 +603,7 @@ public class ShopSystem_7 : MonoBehaviour
             if (i < currentItems.Count)
             {
                 buyButtons[i].gameObject.SetActive(true);
-                itemTexts[i].text = $"{currentItems[i].name}\nCost: {currentItems[i].cost}";
+                itemTexts[i].text = $"{currentItems[i].name}  {currentItems[i].cost}RMB";
 
                 // 设置按钮图片
                 if (currentItems[i].itemImage != null)
@@ -733,5 +668,72 @@ public class ShopSystem_7 : MonoBehaviour
     {
         var parts = period.Split('-');
         return (int.Parse(parts[0]), int.Parse(parts[1]));
+    }
+
+    private void UpdateDeviceButton(int index)
+    {
+        int level = index + 1; // 设备等级从1开始
+        if (deviceLevel >= level)
+        {
+            deviceButtons[index].gameObject.SetActive(false); // 隐藏按钮
+            ShowLowestProfitItems(level); // 显示最低利润商品提示
+        }
+        else
+        {
+            deviceButtons[index].gameObject.SetActive(true); // 显示按钮
+            deviceTexts[index].text = ""; // 清空文本内容
+        }
+    }
+    private void BuyDevice(int level)
+    {
+        if (playerMoney >= GetDevicePrice(level))
+        {
+            playerMoney -= GetDevicePrice(level);
+            deviceLevel = level;
+
+            // 更新总成本，根据当前设备等级决定加入的金额
+            TotalSpent += GetDevicePrice(level);
+
+            UpdateUI();
+        }
+        else
+        {
+            Debug.Log("金额不足！");
+        }
+    }
+
+    private int GetDevicePrice(int level)
+    {
+        switch (level)
+        {
+            case 1:
+                return devicePriceLevel1;
+            case 2:
+                return devicePriceLevel2;
+            case 3:
+                return devicePriceLevel3;
+            default:
+                return 0; // 如果设备等级超过3，返回0（理论上不会发生）
+        }
+    }
+
+    private void ShowLowestProfitItems(int level)
+    {
+        // 计算所有商品的利润
+        List<Item> sortedItems = allItems.OrderBy(item => item.sellPrice - item.cost).ToList();
+
+        // 根据设备等级显示最低利润商品
+        int count = Mathf.Min(level, 3); // 第一次购买显示1个，第二次购买显示2个，第三次购买显示3个
+        string message = "最低利润商品:\n";
+        for (int i = 0; i < count; i++)
+        {
+            if (i < sortedItems.Count) // 确保不会超出商品列表的范围
+            {
+                message += $"{sortedItems[i].name} (利润: {sortedItems[i].sellPrice - sortedItems[i].cost})\n";
+            }
+        }
+
+        // 更新对应的TextMeshProUGUI的文本内容
+        deviceTexts[level - 1].text = message;
     }
 }
