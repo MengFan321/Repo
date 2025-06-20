@@ -21,6 +21,10 @@ public class TimeSystem_7 : MonoBehaviour
     public GameObject specialEventUI; // 特殊事件UI
     public TextMeshProUGUI specialEventText; // 特殊事件文字
 
+    // 新增游戏结束UI
+    public GameObject gameOverUI; // 游戏结束UI
+    public TextMeshProUGUI gameOverText; // 游戏结束文字
+
     // 新增：对话系统引用
     [Header("对话系统")]
     public MultiTimeDialogueTrigger dialogueTrigger; // 对话触发器引用
@@ -29,6 +33,7 @@ public class TimeSystem_7 : MonoBehaviour
     private int gameTimeMonths = 0;
     private int startingYear = 1985;
     private int startingMonth = 1;
+
 
     private bool isCartExceedWorkerCapacity = false;// 新增标志变量
 
@@ -155,6 +160,8 @@ public class TimeSystem_7 : MonoBehaviour
                     int nowMonth = (startingMonth + gameTimeMonths - 1) % 12 + 1;
                     shopSystem.SelectItemsByTime(nowYear, nowMonth);
                     isCartExceedWorkerCapacity = false; // 重置标志
+                    // 检查玩家资金是否不足70
+                    CheckGameOver(nowYear, nowMonth);
                     /***************************************/
                     // 立即暂停
                     PauseTimeForDialogueMonth(checkDateString);
@@ -174,6 +181,8 @@ public class TimeSystem_7 : MonoBehaviour
                 int nowMonth = (startingMonth + gameTimeMonths - 1) % 12 + 1;
                 shopSystem.SelectItemsByTime(nowYear, nowMonth);
                 isCartExceedWorkerCapacity = false; // 重置标志
+                // 检查玩家资金是否不足70
+                CheckGameOver(nowYear, nowMonth);
                 /***************************************/
                 int nextYear = startingYear + (startingMonth + gameTimeMonths - 1) / 12;
                 int nextMonth = (startingMonth + gameTimeMonths - 1) % 12 + 1;
@@ -360,7 +369,7 @@ public class TimeSystem_7 : MonoBehaviour
         if (isCartExceedWorkerCapacity)
         {
             // 添加提醒文本
-            settlementText.text += "\n\nWarning: You have purchased more items than your workers can process.";
+            //settlementText.text += "\n\nWarning: You have purchased more items than your workers can process.";
 
             // 显示未售出的商品信息
             if (shopSystem.excessItems.Count > 0)
@@ -442,5 +451,24 @@ public class TimeSystem_7 : MonoBehaviour
     public void SetCartExceedWorkerCapacity(bool value)
     {
         isCartExceedWorkerCapacity = value;
+    }
+    private void CheckGameOver(int currentYear, int currentMonth)
+    {
+        if (shopSystem.playerMoney < 70)
+        {
+            gameOverUI.SetActive(true); // 显示游戏结束UI
+            string gameOverMessage = "达成破产结局！\n";
+
+            // 检查是否在前5个月内达成破产结局
+            if (gameTimeMonths <= 10) // 前5个月（每2个月结算一次，5 * 2 = 10）
+            {
+                gameOverMessage += "恭喜你获得破产大王称号！";
+            }
+
+            gameOverText.text = gameOverMessage;
+
+            // 停止游戏逻辑
+            Time.timeScale = 0;
+        }
     }
 }

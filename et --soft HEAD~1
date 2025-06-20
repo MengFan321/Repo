@@ -1,0 +1,121 @@
+[33mcommit bbf046a3598ad4e7a51513f6e1b1a32673f43953[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Tue Jun 17 01:10:50 2025 +0800
+
+    完善商城和工厂，增加破产结局
+
+[33mcommit 79016da8933fba4b89d725437559d68f22907875[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Sun Jun 15 00:05:25 2025 +0800
+
+    修改了时间脚本和商店脚本，实现工人和商品，时间和商品的对应关系，
+
+[33mcommit 1a6843ff6e0dbebe6df81069018eeaa19b82c801[m
+Merge: 9fac3b5 2dd74c0
+Author: wakaka2005 <2283346371@qq.com>
+Date:   Wed Jun 11 20:09:28 2025 +0800
+
+    Merge branch 'main' of https://github.com/MengFan321/Repo
+
+[33mcommit 9fac3b59ff5ee6f82d0d5d859f6aa78c3dc7d197[m
+Author: wakaka2005 <2283346371@qq.com>
+Date:   Wed Jun 11 20:09:23 2025 +0800
+
+    新建筑等
+
+[33mcommit 2dd74c06f4bf9219a9124d46eeefff056c6f9361[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Tue Jun 10 21:31:56 2025 +0800
+
+    新增商店贴图
+
+[33mcommit d895224f14daaaf72924ba5e2e6edb79e7009006[m
+Author: wakaka2005 <2283346371@qq.com>
+Date:   Mon Jun 9 19:14:12 2025 +0800
+
+    音效、建筑更新
+
+[33mcommit 7410b310eadfb3759e3a3e0fad7229b0c418701d[m
+Author: wakaka2005 <2283346371@qq.com>
+Date:   Sat Jun 7 14:00:13 2025 +0800
+
+    一点点
+
+[33mcommit d461b4497edb9f49675993635b02151d6324c381[m
+Merge: bb30725 c0b356a
+Author: MengFan321 <2764385638@qq.com>
+Date:   Tue Jun 3 19:10:37 2025 +0800
+
+    Merge branch 'main' of https://github.com/MengFan321/Repo
+
+[33mcommit c0b356aa42098921552ffebaf1ce0efd8bd90e2c[m
+Author: wakaka2005 <2283346371@qq.com>
+Date:   Tue Jun 3 18:37:40 2025 +0800
+
+    。
+
+[33mcommit bb3072565fbed4eb4f70fd5d516fa1148fa34b8a[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Fri May 30 12:32:26 2025 +0800
+
+    增加工厂设备系统
+
+[33mcommit 65b5a53ab2899a9f45d798add413d650dbae0763[m
+Author: wakaka2005 <2283346371@qq.com>
+Date:   Tue May 27 14:51:54 2025 +0800
+
+    npc对话，动画等修改
+
+[33mcommit 5f6769d9034e7b8258c22ef4a9c60d8de718fc18[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Thu May 22 15:05:21 2025 +0800
+
+    Upload
+
+[33mcommit 8d4ce58f92380c62d84e423d63801d4a16647cc2[m
+Author: wakaka2005 <2283346371@qq.com>
+Date:   Tue May 20 21:08:25 2025 +0800
+
+    贴图动画
+
+[33mcommit 5da39edf5473851a8753a7c10ba3e926052891e8[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Sun May 11 21:01:36 2025 +0800
+
+    upload new unity project
+
+[33mcommit de84a5774fb9b40c01797461996b6106a3616f9b[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Tue Apr 22 18:12:24 2025 +0800
+
+    upload
+
+[33mcommit 2f346129f42ee30381c87b5c3a3bee3fe5824931[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Tue Apr 22 18:04:38 2025 +0800
+
+    upload
+
+[33mcommit f12e6c5dd66ab85a77a169d5e591a0af02863033[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Tue Apr 22 11:11:33 2025 +0800
+
+    uploa
+
+[33mcommit 49576558a196be0218018545d5bc626fbe3fa80b[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Tue Apr 22 10:50:10 2025 +0800
+
+    upload
+
+[33mcommit 82d945577519720612bf0c50e5fbee24568484da[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Mon Apr 21 23:09:22 2025 +0800
+
+    upload new Unity project
+
+[33mcommit 113442a08de3f1ed33a0727ee50226bbcf078197[m
+Author: MengFan321 <2764385638@qq.com>
+Date:   Mon Apr 21 20:40:46 2025 +0800
+
+    Initial commit
