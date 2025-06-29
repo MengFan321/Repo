@@ -14,7 +14,7 @@ public class TimerController : MonoBehaviour
 
     [Header("计时器设置")]
     public float stage1Duration = 20f; // 第一阶段时长
-    public float stage2Duration = 20f; // 第二阶段时长  
+    public float stage2Duration = 10f; // 第二阶段时长  
     public float stage3Duration = 10f; // 第三阶段时长
 
     [Header("颜色设置")]

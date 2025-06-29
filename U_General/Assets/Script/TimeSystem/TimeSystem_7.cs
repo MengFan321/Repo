@@ -56,12 +56,15 @@ public class TimeSystem_7 : MonoBehaviour
     // 特殊日期和文字
     private Dictionary<string, string> specialEvents = new Dictionary<string, string>
     {
-        { "1987-05", "中共十三大提出基本路线是以经济建设为中心" },
-        { "1997-07", "香港回归" },
-        { "2007-9", "武汉长江大桥通车五十周年纪念" },
-        { "2008-05", "汶川大地震" },
-        { "2010-01", "5G技术研发" }
+        { "1985-01", "<size=60>最新消息!</size>\n\n中央决定大力扶持发展非公有制经济\n个体小贩不再是资本主义尾巴！" },
+        { "1985-03", "<size=60>香港回归</size>\n\n今日零时香港正式脱离英国政府回归祖国怀抱！\n我国国旗将于香港上空飘荡！" },
+        { "2007-9", "<size=60>武汉长江大桥建成50周年</size>\n\n祝贺武汉长江大桥建成50周年！\n纪念50周年的天堑变通途!" },
+        { "2008-05", "<size=60>汶川大地震</size>\n\n今日汶川发生8.0级特大地震\n国家启动一级响应\n举国同心抗震救灾！" },
+        { "2010-01", "<size=60>5G技术研发成功</size>\n\n我国5G技术成功流入市场\n华为、中兴等企业推进开启了万物互联新时代！" }
     };
+    public List<string> newsEvents = new List<string>(); // 存储已经发生的新闻事件
+    public int currentPage = 0; // 当前显示的新闻页码
+    public int totalPages => newsEvents.Count; // 总页数
 
     void Awake()
     {
@@ -129,7 +132,7 @@ public class TimeSystem_7 : MonoBehaviour
         }
 
         // 每50秒结算一次，但需要先检查接下来的月份是否有对话
-        if (realTimeSeconds >= 50f)
+        if (realTimeSeconds >= 40f)
         {
            
             // 检查接下来的两个月是否有对话
@@ -188,6 +191,8 @@ public class TimeSystem_7 : MonoBehaviour
                 int nextMonth = (startingMonth + gameTimeMonths - 1) % 12 + 1;
                 Debug.Log($"⏰ 正常前进到: {nextYear:D4}-{nextMonth:D2}");
             }
+            // 通知时间变化
+            NotifyTimeChanged();
         }
 
         // 显示商城UI和结算UI
@@ -208,7 +213,7 @@ public class TimeSystem_7 : MonoBehaviour
                 }
             }
         }
-        else if (realTimeSeconds >= 40f && realTimeSeconds < 50f)
+        else if (realTimeSeconds >= 30f && realTimeSeconds < 40f)
         {
             shopUI.SetActive(false);
             settlementUI.SetActive(true);
@@ -233,12 +238,28 @@ public class TimeSystem_7 : MonoBehaviour
 
         timeText.text = $"{currentYear}\n{currentMonth:D2}";
 
+        //// 检查是否达到特殊日期
+        //if (specialEvents.ContainsKey(currentDateString))
+        //{
+        //    specialEventUI.SetActive(true); // 显示特殊事件UI
+        //    //specialEventText.color = Color.red; // 设置特殊事件文字颜色
+        //    specialEventText.text = specialEvents[currentDateString]; // 显示特殊文字
+        //}
+        //else
+        //{
+        //    specialEventUI.SetActive(false); // 隐藏特殊事件UI
+        //}
         // 检查是否达到特殊日期
         if (specialEvents.ContainsKey(currentDateString))
         {
             specialEventUI.SetActive(true); // 显示特殊事件UI
-            specialEventText.color = Color.red; // 设置特殊事件文字颜色
-            specialEventText.text = specialEvents[currentDateString]; // 显示特殊文字
+                                            // 将新事件添加到列表中
+            if (!newsEvents.Contains(specialEvents[currentDateString]))
+            {
+                newsEvents.Insert(0, specialEvents[currentDateString]); // 新事件插入到列表最前面
+            }
+            // 显示当前页的新闻事件
+            specialEventText.text = newsEvents[currentPage];
         }
         else
         {
@@ -258,6 +279,8 @@ public class TimeSystem_7 : MonoBehaviour
             {
                 PauseTimeForDialogueMonth(jumpDateString);
             }
+            // 通知时间变化
+            NotifyTimeChanged();
         }
     }
 
@@ -470,5 +493,37 @@ public class TimeSystem_7 : MonoBehaviour
             // 停止游戏逻辑
             Time.timeScale = 0;
         }
+    }
+
+    public void NextPage()
+    {
+        if (currentPage < totalPages - 1)
+        {
+            currentPage++;
+            if (specialEventUI.activeSelf)
+            {
+                specialEventText.text = newsEvents[currentPage];
+            }
+        }
+    }
+
+    public void PreviousPage()
+    {
+        if (currentPage > 0)
+        {
+            currentPage--;
+            if (specialEventUI.activeSelf)
+            {
+                specialEventText.text = newsEvents[currentPage];
+            }
+        }
+    }
+
+    public delegate void TimeChangedHandler();
+    public event TimeChangedHandler onTimeChanged;
+
+    private void NotifyTimeChanged()
+    {
+        onTimeChanged?.Invoke();
     }
 }

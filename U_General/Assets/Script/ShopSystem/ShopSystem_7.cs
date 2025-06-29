@@ -34,6 +34,8 @@ public class ShopSystem_7 : MonoBehaviour
 
     public Transform itemParent; // 商品父对象（用于组织商品对象）
     public BoxCollider2D itemAreaCollider; // 商品区域的BoxCollider2D
+    public BoxCollider2D itemAreaCollider2; // 第二个商品区域的BoxCollider2D
+    public Transform itemParent2; // 第二个商品父对象（用于组织商品对象）
 
     public TextMeshProUGUI[] itemTexts; // 用于显示商品名称和价格的文本组件数组
 
@@ -312,14 +314,42 @@ public class ShopSystem_7 : MonoBehaviour
 
 
 
+    //private GameObject SpawnItemPrefab(GameObject prefab)
+    //{
+    //    Bounds bounds = itemAreaCollider.bounds;
+    //    Vector3 randomPosition = new Vector3(
+    //        Random.Range(bounds.min.x, bounds.max.x), // x方向随机范围
+    //        Random.Range(bounds.min.y, bounds.max.y) // y方向随机范围
+    //    );
+    //    return Instantiate(prefab, randomPosition, Quaternion.identity, itemParent);
+    //}
     private GameObject SpawnItemPrefab(GameObject prefab)
     {
-        Bounds bounds = itemAreaCollider.bounds;
+        // 随机选择一个商品生成区域
+        int areaIndex = Random.Range(0, 2); // 0 表示第一个区域，1 表示第二个区域
+
+        BoxCollider2D selectedCollider;
+        Transform selectedParent;
+
+        if (areaIndex == 0)
+        {
+            selectedCollider = itemAreaCollider;
+            selectedParent = itemParent;
+        }
+        else
+        {
+            selectedCollider = itemAreaCollider2;
+            selectedParent = itemParent2;
+        }
+
+        // 在选定的区域中随机生成商品
+        Bounds bounds = selectedCollider.bounds;
         Vector3 randomPosition = new Vector3(
             Random.Range(bounds.min.x, bounds.max.x), // x方向随机范围
             Random.Range(bounds.min.y, bounds.max.y) // y方向随机范围
         );
-        return Instantiate(prefab, randomPosition, Quaternion.identity, itemParent);
+
+        return Instantiate(prefab, randomPosition, Quaternion.identity, selectedParent);
     }
 
 

@@ -1890,10 +1890,6 @@ MonoBehaviour:
     m_ClassDefinitionType: 0
   m_CharacterTable:
   - m_ElementType: 1
-    m_Unicode: 8230
-    m_GlyphIndex: 266
-    m_Scale: 1
-  - m_ElementType: 1
     m_Unicode: 78
     m_GlyphIndex: 49
     m_Scale: 1
