@@ -3,20 +3,37 @@ using UnityEngine.UI;
 
 public class PanelController : MonoBehaviour
 {
-    public GameObject panel;       // 需要弹出的面板
-    public Button openButton;      // 用于打开面板的按钮
+    public GameObject panel;      // 设置面板
+    public Button openButton;     // 打开按钮
+    public Button closeButton;    // 关闭按钮
+    public Button quitButton;     // 退出按钮
 
     void Start()
     {
-        // 默认隐藏面板
         panel.SetActive(false);
 
-        // 给按钮添加点击监听
         openButton.onClick.AddListener(ShowPanel);
+        closeButton.onClick.AddListener(HidePanel);
+        quitButton.onClick.AddListener(QuitGame);
     }
 
-    void ShowPanel()
+    public void ShowPanel()
     {
         panel.SetActive(true);
+    }
+
+    public void HidePanel()
+    {
+        panel.SetActive(false);
+    }
+
+    public void QuitGame()
+    {
+        Debug.Log("退出游戏");
+        Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 }
