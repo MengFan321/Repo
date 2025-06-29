@@ -377,7 +377,7 @@ public class TimeSystem_7 : MonoBehaviour
     // 新增：获取当前周期内的时间进度（用于调试）
     public float GetCurrentCycleProgress()
     {
-        return realTimeSeconds / 50f;
+        return realTimeSeconds / 40f;
     }
 
 
