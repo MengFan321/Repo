@@ -54,7 +54,7 @@ public class ShopSystem_7 : MonoBehaviour
         new Item { id = 0, name = "大米", cost = 10, sellPrice = 80, prefab = null },
         new Item { id = 1, name = "苹果", cost = 20, sellPrice = 80, prefab = null },
         new Item { id = 2, name = "盐", cost = 10, sellPrice = 60, prefab = null },
-        new Item { id = 3, name = "田子本", cost = 10, sellPrice = 30, prefab = null },
+        new Item { id = 3, name = "田字本", cost = 10, sellPrice = 30, prefab = null },
         new Item { id = 4, name = "香蕉", cost = 40, sellPrice = 80, prefab = null },
         new Item { id = 5, name = "白菜", cost = 20, sellPrice = 60, prefab = null },
         new Item { id = 6, name = "肥皂", cost = 40, sellPrice = 140, prefab = null },
@@ -759,7 +759,8 @@ public class ShopSystem_7 : MonoBehaviour
         {
             if (i < sortedItems.Count) // 确保不会超出商品列表的范围
             {
-                message += $"{sortedItems[i].name} (利润: {sortedItems[i].sellPrice - sortedItems[i].cost})\n";
+                //message += $"{sortedItems[i].name} (利润: {sortedItems[i].sellPrice - sortedItems[i].cost})\n";
+                message += $"{sortedItems[i].name}  ";
             }
         }
 

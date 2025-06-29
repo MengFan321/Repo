@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;  
 
 public class TimeSystem_7 : MonoBehaviour
 {
@@ -24,6 +25,25 @@ public class TimeSystem_7 : MonoBehaviour
     // 新增游戏结束UI
     public GameObject gameOverUI; // 游戏结束UI
     public TextMeshProUGUI gameOverText; // 游戏结束文字
+
+    // 特殊日期和文字
+    private Dictionary<string, string> specialEvents = new Dictionary<string, string>
+    {
+        { "1987-07", "<size=10>1987-07</size>\n<size=60>特大消息</size>\n中央决定大力扶持发展非公有制经济\n个体小贩不再是资本主义尾巴！" },
+        { "1997-7", "<size=10>1997-7</size>\n<size=60>香港回归！</size>\n今日零时香港正式脱离英国政府回归祖国怀抱！我国国旗将于香港上空飘荡！" },
+        { "2007-11", "<size=10>2007-11</size>\n<size=25>武汉长江大桥建成50周年</size>\n\n祝贺武汉长江大桥建成50周年！\n纪念50周年的天堑变通途!" },
+        { "2008-05", "<size=10>2008-05</size>\n<size=60>汶川大地震</size>\n今日汶川发生8.0级特大地震\n国家启动一级响应\n举国同心抗震救灾！" },
+        { "2010-01", "<size=10>2010-01</size>\n<size=30>5G技术研发成功</size>\n\n我国5G技术成功流入市场！华为、中兴等企业推进开启了万物互联新时代！" }
+    };
+    public List<string> newsEvents = new List<string>(); // 存储已经发生的新闻事件
+    public int currentPage = 0; // 当前显示的新闻页码
+    public int totalPages => newsEvents.Count; // 总页数
+
+    public Image specialEventImage; // 特殊事件图片容器
+
+    // 新增：特殊事件图片资源字典
+    private Dictionary<string, Sprite> specialEventImages = new Dictionary<string, Sprite>();
+
 
     // 新增：对话系统引用
     [Header("对话系统")]
@@ -53,18 +73,7 @@ public class TimeSystem_7 : MonoBehaviour
     public int CurrentGameMonth => gameTimeMonths % 12 + 1;
 
 
-    // 特殊日期和文字
-    private Dictionary<string, string> specialEvents = new Dictionary<string, string>
-    {
-        { "1985-01", "<size=60>最新消息!</size>\n\n中央决定大力扶持发展非公有制经济\n个体小贩不再是资本主义尾巴！" },
-        { "1985-03", "<size=60>香港回归</size>\n\n今日零时香港正式脱离英国政府回归祖国怀抱！\n我国国旗将于香港上空飘荡！" },
-        { "2007-9", "<size=60>武汉长江大桥建成50周年</size>\n\n祝贺武汉长江大桥建成50周年！\n纪念50周年的天堑变通途!" },
-        { "2008-05", "<size=60>汶川大地震</size>\n\n今日汶川发生8.0级特大地震\n国家启动一级响应\n举国同心抗震救灾！" },
-        { "2010-01", "<size=60>5G技术研发成功</size>\n\n我国5G技术成功流入市场\n华为、中兴等企业推进开启了万物互联新时代！" }
-    };
-    public List<string> newsEvents = new List<string>(); // 存储已经发生的新闻事件
-    public int currentPage = 0; // 当前显示的新闻页码
-    public int totalPages => newsEvents.Count; // 总页数
+    
 
     void Awake()
     {
@@ -76,6 +85,8 @@ public class TimeSystem_7 : MonoBehaviour
         {
             Destroy(gameObject); // 防止场景中有多个 TimeSystem_7 导致冲突
         }
+        // 初始化特殊事件图片资源字典
+        InitializeSpecialEventImages();
     }
 
     void Start()
@@ -200,7 +211,7 @@ public class TimeSystem_7 : MonoBehaviour
         {
             shopUI.SetActive(true);
             settlementUI.SetActive(false);
-            specialEventUI.SetActive(false); // 隐藏特殊事件UI
+            //specialEventUI.SetActive(false); // 隐藏特殊事件UI
 
             // 如果刚进入新月份且在商城阶段，检查是否需要显示对话气泡
             if (monthJustChanged && realTimeSeconds < 1f)
@@ -218,7 +229,7 @@ public class TimeSystem_7 : MonoBehaviour
             shopUI.SetActive(false);
             settlementUI.SetActive(true);
             ShowSettlement();
-            specialEventUI.SetActive(false); // 隐藏特殊事件UI
+            //specialEventUI.SetActive(false); // 隐藏特殊事件UI
         }
         else
         {
@@ -238,32 +249,67 @@ public class TimeSystem_7 : MonoBehaviour
 
         timeText.text = $"{currentYear}\n{currentMonth:D2}";
 
-        //// 检查是否达到特殊日期
-        //if (specialEvents.ContainsKey(currentDateString))
-        //{
-        //    specialEventUI.SetActive(true); // 显示特殊事件UI
-        //    //specialEventText.color = Color.red; // 设置特殊事件文字颜色
-        //    specialEventText.text = specialEvents[currentDateString]; // 显示特殊文字
-        //}
-        //else
-        //{
-        //    specialEventUI.SetActive(false); // 隐藏特殊事件UI
-        //}
         // 检查是否达到特殊日期
         if (specialEvents.ContainsKey(currentDateString))
         {
             specialEventUI.SetActive(true); // 显示特殊事件UI
-                                            // 将新事件添加到列表中
+
+            // 将新事件添加到列表中
             if (!newsEvents.Contains(specialEvents[currentDateString]))
             {
                 newsEvents.Insert(0, specialEvents[currentDateString]); // 新事件插入到列表最前面
             }
+
             // 显示当前页的新闻事件
             specialEventText.text = newsEvents[currentPage];
+
+            // 新增：显示对应图片
+            if (specialEventImages.ContainsKey(currentDateString))
+            {
+                Sprite sprite = specialEventImages[currentDateString];
+                if (sprite != null)
+                {
+                    specialEventImage.sprite = sprite;
+                    specialEventImage.gameObject.SetActive(true); // 确保图片容器是激活的
+                    Debug.Log($"图片 {currentDateString} 已正确显示");
+                }
+                else
+                {
+                    Debug.LogError($"图片 {currentDateString} 未正确加载");
+                }
+            }
+            else
+            {
+                specialEventImage.gameObject.SetActive(false); // 如果没有图片，隐藏图片容器
+            }
         }
         else
         {
-            specialEventUI.SetActive(false); // 隐藏特殊事件UI
+            //specialEventUI.SetActive(false); // 隐藏特殊事件UI
+            specialEventImage.gameObject.SetActive(false); // 隐藏图片容器
+        }
+
+        // 检查是否需要更新图片
+        if (currentPage < newsEvents.Count)
+        {
+            string currentEventDate = GetDateFromNewsEvent(newsEvents[currentPage]);
+            if (currentEventDate != null && specialEventImages.ContainsKey(currentEventDate))
+            {
+                Sprite sprite = specialEventImages[currentEventDate];
+                if (sprite != null)
+                {
+                    specialEventImage.sprite = sprite;
+                    specialEventImage.gameObject.SetActive(true); // 确保图片容器是激活的
+                }
+                else
+                {
+                    specialEventImage.gameObject.SetActive(false); // 如果没有图片，隐藏图片容器
+                }
+            }
+            else
+            {
+                specialEventImage.gameObject.SetActive(false); // 如果没有图片，隐藏图片容器
+            }
         }
 
         //  按 T 键跳转到 Inspector 中设置的目标年月（仅用于测试，可删）
@@ -386,7 +432,7 @@ public class TimeSystem_7 : MonoBehaviour
         int totalSpent = shopSystem.TotalSpent;
         int totalSellPrice = shopSystem.CalculateTotalSellPrice();
 
-        settlementText.text = $"Checkout：\nCost: {totalSpent}\nSell: {totalSellPrice}";
+        settlementText.text = $"结算：\n成本: {totalSpent}销售额: {totalSellPrice}";
 
         // 检查是否需要显示提醒
         if (isCartExceedWorkerCapacity)
@@ -397,10 +443,10 @@ public class TimeSystem_7 : MonoBehaviour
             // 显示未售出的商品信息
             if (shopSystem.excessItems.Count > 0)
             {
-                settlementText.text += "\n\nUnsold Items:";
+                settlementText.text += "\n未售出商品：\n";
                 foreach (var item in shopSystem.excessItems)
                 {
-                    settlementText.text += $"\n- {item.name} (Cost: {item.cost}, Sell Price: {item.sellPrice})";
+                    settlementText.text += $"|{item.name} (成本: {item.cost}, 售价: {item.sellPrice})";
                 }
             }
 
@@ -485,7 +531,7 @@ public class TimeSystem_7 : MonoBehaviour
             // 检查是否在前5个月内达成破产结局
             if (gameTimeMonths <= 10) // 前5个月（每2个月结算一次，5 * 2 = 10）
             {
-                gameOverMessage += "恭喜你获得破产大王称号！";
+                gameOverMessage += "恭喜你获得破产大王称号！\n很遗憾的通知您，由于您的本金已不足以开启下一关，您破产了。令我们没想到的是，您在五个月内实现了破产，嗯，经过我们的深思熟虑，我们决定授予您“破产大王”称号。";
             }
 
             gameOverText.text = gameOverMessage;
@@ -505,6 +551,7 @@ public class TimeSystem_7 : MonoBehaviour
                 specialEventText.text = newsEvents[currentPage];
             }
         }
+        UpdateSpecialEventImage(); // 更新图片
     }
 
     public void PreviousPage()
@@ -517,6 +564,7 @@ public class TimeSystem_7 : MonoBehaviour
                 specialEventText.text = newsEvents[currentPage];
             }
         }
+        UpdateSpecialEventImage(); // 更新图片
     }
 
     public delegate void TimeChangedHandler();
@@ -525,5 +573,64 @@ public class TimeSystem_7 : MonoBehaviour
     private void NotifyTimeChanged()
     {
         onTimeChanged?.Invoke();
+    }
+
+    // 新增：初始化特殊事件图片资源字典
+    private void InitializeSpecialEventImages()
+    {
+        specialEventImages.Add("1987-07", Resources.Load<Sprite>("SpecialEvents/1"));
+        specialEventImages.Add("1997-07", Resources.Load<Sprite>("SpecialEvents/2"));
+        specialEventImages.Add("2007-11", Resources.Load<Sprite>("SpecialEvents/3"));
+        specialEventImages.Add("2008-05", Resources.Load<Sprite>("SpecialEvents/4"));
+        specialEventImages.Add("2010-01", Resources.Load<Sprite>("SpecialEvents/5"));
+    }
+    private void UpdateSpecialEventImage()
+    {
+        // 获取当前新闻事件的日期
+        string currentEventDate = GetDateFromNewsEvent(newsEvents[currentPage]);
+        Debug.Log($"当前新闻事件日期: {currentEventDate}");
+
+        // 检查是否有对应的图片
+        if (specialEventImages.ContainsKey(currentEventDate))
+        {
+            Sprite sprite = specialEventImages[currentEventDate];
+            if (sprite != null)
+            {
+
+                specialEventImage.gameObject.SetActive(true); // 确保图片容器是激活的
+                Debug.Log($"加载并显示图片: {currentEventDate}");
+                specialEventImage.sprite = sprite;
+                // 强制刷新 UI
+                Canvas.ForceUpdateCanvases();
+            }
+            else
+            {
+                Debug.LogError($"图片 {currentEventDate} 未正确加载");
+                specialEventImage.gameObject.SetActive(false); // 如果没有图片，隐藏图片容器
+            }
+        }
+        else
+        {
+            Debug.Log($"没有找到对应的图片: {currentEventDate}");
+            specialEventImage.gameObject.SetActive(false); // 如果没有图片，隐藏图片容器
+        }
+    }
+    private string GetDateFromNewsEvent(string newsEventText)
+    {
+        // 新的新闻事件文本格式是 "<size=10>1985-01</size>\n<size=60>特大消息</size>\n\n..."
+        // 使用字符串操作来提取日期
+        int startIndex = newsEventText.IndexOf("<size=10>") + "<size=10>".Length;
+        int endIndex = newsEventText.IndexOf("</size>", startIndex);
+        if (startIndex != -1 && endIndex != -1)
+        {
+            string date = newsEventText.Substring(startIndex, endIndex - startIndex).Trim();
+            Debug.Log($"从新闻事件文本中提取的日期: {date}");
+            return date;
+        }
+        else
+        {
+            Debug.LogError("新闻事件文本格式不匹配，无法提取日期");
+            return null; // 如果格式不匹配，返回 null
+        }
     }
 }
