@@ -24,6 +24,8 @@ public class TimeSystem_7 : MonoBehaviour
     // 新增游戏结束UI
     public GameObject gameOverUI; // 游戏结束UI
     public TextMeshProUGUI gameOverText; // 游戏结束文字
+    public GameObject gameWinUI; // 游戏结束UI
+    public TextMeshProUGUI gameWinText; // 游戏结束文字
 
     // 特殊日期和文字
     private Dictionary<string, string> specialEvents = new Dictionary<string, string>
@@ -167,6 +169,7 @@ public class TimeSystem_7 : MonoBehaviour
                     gameTimeMonths = targetGameMonths;
                     realTimeSeconds = 0f;
                     shopSystem.AutoCheckout();
+                   
                     /***************************************/
                     // 根据当前时间选择商品
                     int nowYear = startingYear + (startingMonth + gameTimeMonths - 1) / 12;
@@ -175,6 +178,7 @@ public class TimeSystem_7 : MonoBehaviour
                     isCartExceedWorkerCapacity = false; // 重置标志
                     // 检查玩家资金是否不足70
                     CheckGameOver(nowYear, nowMonth);
+                    CheckGameWin(nowYear, nowMonth);
                     /***************************************/
                     // 立即暂停
                     PauseTimeForDialogueMonth(checkDateString);
@@ -188,6 +192,7 @@ public class TimeSystem_7 : MonoBehaviour
                 gameTimeMonths += 2;
                 realTimeSeconds = 0f;
                 shopSystem.AutoCheckout();
+                
                 /***************************************/
                 // 根据当前时间选择商品
                 int nowYear = startingYear + (startingMonth + gameTimeMonths - 1) / 12;
@@ -196,6 +201,7 @@ public class TimeSystem_7 : MonoBehaviour
                 isCartExceedWorkerCapacity = false; // 重置标志
                 // 检查玩家资金是否不足70
                 CheckGameOver(nowYear, nowMonth);
+                CheckGameWin(nowYear, nowMonth);
                 /***************************************/
                 int nextYear = startingYear + (startingMonth + gameTimeMonths - 1) / 12;
                 int nextMonth = (startingMonth + gameTimeMonths - 1) % 12 + 1;
@@ -535,6 +541,19 @@ public class TimeSystem_7 : MonoBehaviour
 
             gameOverText.text = gameOverMessage;
 
+            // 停止游戏逻辑
+            Time.timeScale = 0;
+        }
+    }
+
+    private void CheckGameWin(int currentYear, int currentMonth)
+    {
+        if (shopSystem.playerMoney >= 100000)
+        {
+            gameWinUI.SetActive(true); // 显示游戏结束UI
+            string gameWinMessage = "恭喜！我们看见小镇里的工厂被打理的井井有条。我们要告知您的喜讯是——根据我们的评定，您的工厂已经成为“全国十强企业”！它是民族产业的榜样！";
+
+            gameWinText.text = gameWinMessage;
             // 停止游戏逻辑
             Time.timeScale = 0;
         }
