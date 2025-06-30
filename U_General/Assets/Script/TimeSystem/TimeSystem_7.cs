@@ -7,10 +7,9 @@ using UnityEngine.UI;
 public class TimeSystem_7 : MonoBehaviour
 {
     //仅用于测试（可删）
-    public int debugTargetYear = 1986;
-    public int debugTargetMonth = 5;
+    //public int debugTargetYear = 1986;
+    //public int debugTargetMonth = 5;
     public static TimeSystem_7 Instance { get; private set; }
-    //后续可删
 
     public TextMeshProUGUI timeText; // 显示游戏时间的TextMeshProUGUI
     public GameObject shopUI; // 商城UI
@@ -30,7 +29,7 @@ public class TimeSystem_7 : MonoBehaviour
     private Dictionary<string, string> specialEvents = new Dictionary<string, string>
     {
         { "1987-07", "<size=10>1987-07</size>\n<size=60>特大消息</size>\n中央决定大力扶持发展非公有制经济\n个体小贩不再是资本主义尾巴！" },
-        { "1997-7", "<size=10>1997-7</size>\n<size=60>香港回归！</size>\n今日零时香港正式脱离英国政府回归祖国怀抱！我国国旗将于香港上空飘荡！" },
+        { "1997-07", "<size=10>1997-7</size>\n<size=60>香港回归！</size>\n今日零时香港正式脱离英国政府回归祖国怀抱！我国国旗将于香港上空飘荡！" },
         { "2007-11", "<size=10>2007-11</size>\n<size=25>武汉长江大桥建成50周年</size>\n\n祝贺武汉长江大桥建成50周年！\n纪念50周年的天堑变通途!" },
         { "2008-05", "<size=10>2008-05</size>\n<size=60>汶川大地震</size>\n今日汶川发生8.0级特大地震\n国家启动一级响应\n举国同心抗震救灾！" },
         { "2010-01", "<size=10>2010-01</size>\n<size=30>5G技术研发成功</size>\n\n我国5G技术成功流入市场！华为、中兴等企业推进开启了万物互联新时代！" }
@@ -312,22 +311,22 @@ public class TimeSystem_7 : MonoBehaviour
             }
         }
 
-        //  按 T 键跳转到 Inspector 中设置的目标年月（仅用于测试，可删）
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            gameTimeMonths = (debugTargetYear - startingYear) * 12 + (debugTargetMonth - startingMonth);
-            realTimeSeconds = 0f; // 重置秒数
-            Debug.Log($"⏩ 快速跳转到时间: {debugTargetYear}-{debugTargetMonth:D2}");
+        ////  按 T 键跳转到 Inspector 中设置的目标年月（仅用于测试，可删）
+        //if (Input.GetKeyDown(KeyCode.T))
+        //{
+        //    gameTimeMonths = (debugTargetYear - startingYear) * 12 + (debugTargetMonth - startingMonth);
+        //    realTimeSeconds = 0f; // 重置秒数
+        //    Debug.Log($"⏩ 快速跳转到时间: {debugTargetYear}-{debugTargetMonth:D2}");
 
-            // 检查跳转后的月份
-            string jumpDateString = $"{debugTargetYear:D4}-{debugTargetMonth:D2}";
-            if (dialogueTrigger != null && dialogueTrigger.IsDialogueMonth(jumpDateString))
-            {
-                PauseTimeForDialogueMonth(jumpDateString);
-            }
-            // 通知时间变化
-            NotifyTimeChanged();
-        }
+        //    // 检查跳转后的月份
+        //    string jumpDateString = $"{debugTargetYear:D4}-{debugTargetMonth:D2}";
+        //    if (dialogueTrigger != null && dialogueTrigger.IsDialogueMonth(jumpDateString))
+        //    {
+        //        PauseTimeForDialogueMonth(jumpDateString);
+        //    }
+        //    // 通知时间变化
+        //    NotifyTimeChanged();
+        //}
     }
 
     // 新增：延迟激活气泡的协程
